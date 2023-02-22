@@ -4,7 +4,8 @@
   "description": "creacion de una api",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/GabrielRuberttone/UTN-final2-creacion-api/issues"
   },
-  "homepage": "https://github.com/GabrielRuberttone/UTN-final2-creacion-api#readme"
+  "homepage": "https://github.com/GabrielRuberttone/UTN-final2-creacion-api#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.9.2"
+  },
+  "devDependencies": { 
+    "nodemon": "^2.0.20"
+  }
 }
