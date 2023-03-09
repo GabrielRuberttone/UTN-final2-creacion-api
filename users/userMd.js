@@ -14,6 +14,15 @@ password: {type: String, require: true},
   }
 );
 
+//al userSchema le seteamos algunas caracteristicas-No eliminamos de la BD, eliminamos de la Respuesta-
+userSchema.set("toJSON", { //1- el primer seteo es que siga estando en formato json 
+  transform (doc, ret){//2- luego pasamos lo que queremos transformar, para ello pasamos la funcion transform que recibe 2 parametros doc, ret 
+    delete ret.__v;//3-no quiero que se vea ret. __versionn
+    delete ret.password; //4- no quiero que se vea la password
+  }      
+});                
+
+
 //Mongo DB model (es lo que me permite interactuar con los datos)
 const User = mongoose.model("User", userSchema) //el modelo se basa en un schema
 

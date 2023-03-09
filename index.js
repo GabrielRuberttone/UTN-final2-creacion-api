@@ -1,4 +1,4 @@
-require("dotenv").config() //importamos dotenv para que lo pueda leer el proyecto 
+// require("dotenv").config() //importamos dotenv para que lo pueda leer el proyecto 
 
 const express = require ("express") //requerimos express. En la const express ponemos todo lo de 'express'
 require("./config/db.js") //requerimos el archivo de configuracion de la Base de datos
@@ -6,12 +6,16 @@ require("./config/db.js") //requerimos el archivo de configuracion de la Base de
 const PORT = process.env.PORT || 3030; 
 const server = express(); //creamos nuestro servidor. En server estan todos los archivos de express. si escribo server. me aparecen todos los metodos que tiene express Ej: server._router   server.addListener  server.get
 
+//expres core middleware
+server.use(express.static('public'));
+server.use(express.json())
+server.use(express.urlencoded({extended: true })) 
+
+
 //users routing
 //primero pongo la ruta- luego requiero al archivo en que envio el req para resolverlo
 server.use("/api/users", require("./users/userRt"));
 
-
-server.use(express.static('public'));
 
 server.listen(PORT,(err)=> { //le decimos que el servidor escuche peticiones en un puerto 3030 
 !err ?
@@ -19,3 +23,4 @@ server.listen(PORT,(err)=> { //le decimos que el servidor escuche peticiones en 
     :
     console.log(`server down du to: ${err}`);
 });
+                                 

@@ -1,8 +1,7 @@
+require("dotenv").config() //importamos dotenv para que lo pueda leer el proyecto 
 
-//Mongo DB Atlas cloud connection (mongo atlas es la nube dode esta desplegada la BD)
-const mongoose = require('mongoose')//importamos 
-
-
+//Mongo DB Atlas cloud connection (mongo atlas es la nube donde esta desplegada la BD)
+const mongoose = require("mongoose")//importamos 
 
 //a partir de la version 6 de mongoose no es necesario, aunque quizas alguna vez necesitamos configurar algo
 const options ={
