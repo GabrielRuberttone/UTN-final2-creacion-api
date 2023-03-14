@@ -1,6 +1,7 @@
 //SOLO HACEMOS EL ENRUTAMIENTO
 //requerimos express: Como utiliza el router nativo de express lo vamos a traer
 const router = require("express").Router();
+const uploadPic = require("../utils/handleStorage") //traemos el midleware de multer para cargar la imagen
 
 //traemos las funciones de userCt.js
 const {getAllUsers,  deleteUserById, createUser, updateUser} = require("./userCt")//puedo hacerlo de esta forma, o como la linea que sigue
@@ -10,7 +11,7 @@ const {getAllUsers,  deleteUserById, createUser, updateUser} = require("./userCt
 router.get("/", getAllUsers );//escribir "/" es igual a escribir "api/users", pero si escribo esto segundo se estaria duplicando la ruta. 
 
 //creo el usuario
-router.post("/", createUser)  //uso el metodo post e indico cual es la ruta.
+router.post("/", uploadPic.single("profilePic"), createUser)  //uso el metodo post e indico cual es la ruta.
 // router.post("/", userCt.createUser) //si uso la segunda forma para traer las funciones de userCt, tengo que usar esto. 
 
 //update user
