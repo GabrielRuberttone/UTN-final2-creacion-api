@@ -25,4 +25,18 @@ server.listen(PORT,(err)=> { //le decimos que el servidor escuche peticiones en 
     :
     console.log(`server down du to: ${err}`);
 });
-                                 
+                      
+//404
+server.use((req, res, next)=>{ //decimos que el servidor haga uso de una req y una res, e introducimos la funcion next, cdo la invoco pasa el control a la siguiente instruccio
+    let error = new Error(); // Es un objeto de la clase error, por lo cual tiene su status
+    error.message ="resource not found"; //resource son los recursos o datos.
+    error.status = 404; //el status es el codigo de estado que le devolves a la API
+    next(error) //le indica que pase el error, al siguiente manejador de errores, al error handling
+})  
+
+//General Error handling (o manejador de errores en general). Si la anterior funcion para manejar el error fallo, esta maneja el resto para que no detone el programa.
+server.use((error, req, res, next)=>{ //como de aca no voy a ningun lado no necesito poner next 
+  res
+    .status(error.status)
+    .json({status: error.status, message: error.message}) //la respuesta la hago aca
+});

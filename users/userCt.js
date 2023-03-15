@@ -7,13 +7,16 @@ const User = require("./userMd")
 const public_url = process.env.public_url;
 
 // get all users. Creo las funciones que luego voy a llamar en el userRt.js
-const getAllUsers = (req, res) => {
+const getAllUsers = (req, res, next) => {//agregamos la funcion next para manejar errores
    User.find().then((data) => {//mongoose tiene un metodo para buscar todo, al que llamo con User.
       !data.length 
-      ? res.status(404).json({message: "not found"}) //el status se pone antes
+      ? next() //le agregamos el next 
       : res.status(200).json(data);
       // res.json(data); NOTA TIRABA ERROR: en un foro dijeron que era porq habia dos res, borre y funciona. 
-   }).catch((error) => console.log(error));
+   }).catch((error) => {
+      error.status =500 
+      next(error) //de aca vamos al middleware de errores. 
+   });
 };
 
 // const getAllUsers = (req, res) => {
@@ -21,7 +24,7 @@ const getAllUsers = (req, res) => {
 // };
 
 //create User
-const createUser = async (req, res) => {
+const createUser = async (req, res,next) => {
 
  const profilePics = `${public_url}/storage/${req.file.filename}` //quiero la url del archivo - el archivo viene aca: req.file.filename 
 
@@ -33,33 +36,34 @@ const createUser = async (req, res) => {
    newUser.save((error, result)=>{
      console.log(result);
      if (error) {
-       res.status(400).json({message: error.message});//configuro el error cdo el nuevo usuario tien cosas duplicadas
+      error.status = 400;
+      next(error);
       } else {
-       res.status(200).json(result);//CAMBIO DE CODIGO!!!  res.status(200).json(result); -- asi funciona:  res.status(200).json(newUser);
+       res.status(200).json(newUser);//CAMBIO DE CODIGO!!!  res.status(200).json(result); -- asi funciona:  res.status(200).json(newUser);
      }
   });
 };
 
 //update user:
-const updateUser = async (req, res) => { //creamos una constante  que se llame updateUser
+const updateUser = async (req, res, next) => { //creamos una constante  que se llame updateUser
 try {
    const user = await User.findByIdAndUpdate(req.params.id, req.body,{new:true}); //utilizamos el metodo findByIdAndUpdate. Como primer parametro recibimos el id que sirve para encontrarlo, y como segundo parametro el body completo. Para que funcione le tengo que pasar un id y tambien un body. 
 //Si quiero recibir el dato actualizado, y no como estaba antes, a la petición tengo que colocarle {new: true}
 res.status(200).json({message:"Usuario con cambios", usuario:user});
 
 } catch (error) {
-   res.status(404).json({ message: "Usuario no encontrado"});//copio lo mismo que el delete. Si no encuentra algo no lo puede actualizar. 
+next()
 }
 };
 
 
 //Delete user by id. Como es una operacion asincronica la manejamos con async/await
-const deleteUserById = async (req, res) => {
+const deleteUserById = async (req, res, next) => {
 try {
    const user = await User.findByIdAndDelete(req.params.id) //req.params.id ahí esta el id cuyo dato queremos encontrar para su borrado en la BD
    res.status(200).json({user: user.id, message: "Usuario borrado."})//elijo status (en vez de sendStatus) porque quiero personalizar el mensaje. Como buena practica porque estamos en una api elijo el formato JSON
 }catch(error){ //usamos un try/cach pero podemos usar otra cosa tambien
-   res.status(404).json({ message: "Usuario no encontrado"});//si no encuentra el usuario, tira un 404 y un mensaje de usuario no encontrado.
+next();
 }
 };
 
