@@ -4,7 +4,7 @@ const router = require("express").Router();
 const uploadPic = require("../utils/handleStorage") //traemos el midleware de multer para cargar la imagen
 
 //traemos las funciones de userCt.js
-const {getAllUsers,  deleteUserById, createUser, updateUser} = require("./userCt")//puedo hacerlo de esta forma, o como la linea que sigue
+const {getAllUsers,  deleteUserById, createUser, updateUser, loginUser} = require("./userCt")//puedo hacerlo de esta forma, o como la linea que sigue
 // const userCt = require("./userCt") //otra forma de traer metodos de usertCt
 
 //ahora manejo los distintos metodos y verbos del http: get, post, delete, etc..
@@ -13,6 +13,9 @@ router.get("/", getAllUsers );//escribir "/" es igual a escribir "api/users", pe
 //creo el usuario
 router.post("/", uploadPic.single("profilePic"), createUser)  //uso el metodo post e indico cual es la ruta.
 // router.post("/", userCt.createUser) //si uso la segunda forma para traer las funciones de userCt, tengo que usar esto. 
+
+//hacemos la ruta del login
+router.post("/login", loginUser)
 
 //update user
 router.put("/:id", updateUser)
