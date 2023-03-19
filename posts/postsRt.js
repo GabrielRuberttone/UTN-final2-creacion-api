@@ -11,7 +11,7 @@ router.get("/", postCt.listAllPosts);
 //3 hacemos la funcion en el postsCt.js para que no tire error
 
 //buscamos un posteo con una query. En este caso un title.
-router.get("/find:query", postCt.finByTitle );
+router.get("/find/:query", postCt.finByTitle );
 
 //create new post
 // router.post("/", isAuth, postCt.createNewPost); 
