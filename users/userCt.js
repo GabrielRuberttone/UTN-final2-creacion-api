@@ -25,14 +25,16 @@ const getAllUsers = (req, res, next) => {//agregamos la funcion next para maneja
 
 //create User
 const createUser = async (req, res,next) => {
-
- const profilePics = `${public_url}/storage/${req.file.filename}` //quiero la url del archivo - el archivo viene aca: req.file.filename 
+ let pic = ""; //lo hacemos para que no rompa el codigo si el usuario no carga una imagen.
+ if(req.file){ //si viene un archivo
+   pic = `${public_url}/storage/${req.file.filename}` //quiero la url del archivo - el archivo viene aca: req.file.filename 
+ } 
 
  //Encriptamos la password: antes de enviar lo que puso el usuario en el formulario a la base de datos, tenemos que encriptar la contraseña. 
  const password = await bc.hashPassword(req.body.password) //con req.body.password traemos la contrasena q pone el usuario.
 
  //Envio los datos a la Base de Datos:
-  const newUser = new User({...req.body, profilePics, password}); //1 creamos un nuevo usuario, que es una instancia de una clase. 
+  const newUser = new User({...req.body, profilePics: pic, password}); //1 creamos un nuevo usuario, que es una instancia de una clase. 
    newUser.save((error, result)=>{
      console.log(result);
      if (error) {

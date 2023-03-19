@@ -39,7 +39,8 @@ server.use((req, res, next)=>{ //decimos que el servidor haga uso de una req y u
 
 //General Error handling (o manejador de errores en general). Si la anterior funcion para manejar el error fallo, esta maneja el resto para que no detone el programa.
 server.use((error, req, res, next)=>{ //como de aca no voy a ningun lado no necesito poner next 
-  res
+  if (!error.status) error.status = 400; //repara la llegada de un error que no tiene estado. 
+    res
     .status(error.status)
     .json({status: error.status, message: error.message}) //la respuesta la hago aca
 });
