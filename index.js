@@ -14,10 +14,13 @@ server.use(express.urlencoded({extended: true }))
 //external middlewares
 server.use(cors());//esto lleva una configuracion, aca indico desde donde se puede acceder o no, sino indico nada se puede acceder desde cualquier servidor q sea distinto de donde esta alojada la API. 
 
-//users routing
+//users routing (ruta para los usuarios)
 //primero pongo la ruta- luego requiero al archivo en que envio el req para resolverlo
 server.use("/api/users", require("./users/userRt"));
 
+//post routing(rutas para los posteos)
+server.use("/api/post", require ("./posts/postsRt"));
+//      ruta del endpoin        llamo al enrutador, quien maneja las rutas
 
 server.listen(PORT,(err)=> { //le decimos que el servidor escuche peticiones en un puerto 3030 
 !err ?
