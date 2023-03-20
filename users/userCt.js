@@ -5,6 +5,9 @@ const User = require("./userMd")
 //importamos en .env para traer la url que vamos a usar en imagen
 const public_url = process.env.public_url;
 const jwt = require("../utils/handleJWT"); //importamos el token
+const transporter = require("../utils/handleMailer") //importamos el manejador de email
+
+const { link } = require("fs"); //ESTO NO LO TIENE EL PROFESOR EN CODIGO 00:47:12 video clase 23
 
 // get all users. Creo las funciones que luego voy a llamar en el userRt.js
 const getAllUsers = (req, res, next) => {//agregamos la funcion next para manejar errores
@@ -97,8 +100,71 @@ const loginUser = async (req, res, next) => {//es asincronico porque hay una ope
    Token: accessToken,
    userData: userForToken //si queremos, asi mostramos los datos del usario
 })  //enviamos la respuesta al frontEnd quien tiene que guardar el token
+};
+
+/*FORGOT PASSWORD (este servicio enviara un email con un link de recuperacion de contrasena, el email del usuario registrado 
+en la base de datos. Desde ese link, que incluira un token de seguridad podremos ir al formulario de recuperacion y este 
+vinculara con el procedicmiento de restauracion de contrasena -> esta se va a persistir en la BD.)*/
+const forgot = async(req, res, next)=>{ 
+ let error = new Error("No user with than email");  //1 como voy a tener que trabajar con un error lo voy a ir definiendo. 
+ const user = await User.find().where({email: req.body.email}) //2 existe el mail? (esto devuelve un arreglo, si viene vacio es xq no existe el email en la BD)
+ if(!user.length){ //si viene vacio hace esto
+   error.status = 404;//no necesito poner el message del error porque ya lo puse al definir el error en let error = new Error...
+   return next(error)// esto va al middelware de errores.
+ } 
+ //si existe el email generamos el token de seguridad y el link de recuperacion que enviaremos al user
+ const userForToken ={  //creamos el usuario que le ponemos el link de seguridad. Es un objeto:
+   id:user[0].id,     //traemos el id.
+   name: user[0].fullName,
+   email: user[0].email //ya tengo mi objeto con datos del usuario para poner dentro del token
+ }
+ const token = await jwt.tokenSign(userForToken, "15m")//ahora creamos el token y le ponemos los datos del usuario y el tiempo en que expira.
+ const link = `${process.env.public_url}/api/users/reset/${token}`//generamos el link que incluye la url y el token, y creamos una ruta llamada reset 
+
+
+ //creamos el cuerpo de email, lo enviamos al usuario del mail e indicamos esto en la response
+ const mailDetails = {
+   from: "Tech-Support@mydomain.com",
+   to: userForToken.email,
+   subject: "Password recovery magic link",
+   html:`<h2> Password Recovery service </h2> 
+   <p> To reset your password, please click the link and type in a new password </p>
+   <a href="${link}"> click to reset password </a>
+   ` 
+ };
+ transporter.sendMail(mailDetails, (error, data)=>{
+   if(error){ //preguntamos si hay un error en el envio
+      next(error)
+   } else {//si no hay error 
+   res.status(200).json({ message:`Hi ${userForToken.name}, we' ve sent an email whit instructions to  ${userForToken.email}`}) //envia el mail con las instrucciones
+   }
+ });
 }
 
+//hacemos algo sencillo para probar
+const reset  = async (req, res, next) =>{
+const {token} = req.params;
+const tokenStatus = await jwt.tokenVerify(token);
+if(tokenStatus instanceof Error) {
+   return next (tokenStatus);
+} res.render("reset", {token, tokenStatus});
+};
+
+//guardamos la nueva password
+const saveNewPass = async (req, res, next ) =>{
+const {token} = req.params;//traemos el token que esta en la req
+const tokenStatus = await jwt.tokenVerify(token);
+ if(tokenStatus instanceof Error) return next (tokenStatus);//si paso de esta linea no hubo error
+ const newPassword = await bc.hashPassword(req.body.password_1)
+ //ahora actualizamos el usuario, al usuario le cambiamos la contrasena
+ try{
+const updateUser = await User.findByIdAndUpdate(tokenStatus.id, {
+password: newPassword}); //guardamos el usuario actualizado
+res.status(200).json({message: `Password changed for user ${tokenStatus.name}`})//resuelvo la aplicacion para que no quede dando vueltas el form
+ }catch(error){
+   next(error)
+ }
+};
 
 //exportamos el modulo con las funciones que hicimos
-module.exports = { getAllUsers, deleteUserById, createUser, updateUser, loginUser };
+module.exports = { getAllUsers, deleteUserById, createUser, updateUser, loginUser, forgot, reset, saveNewPass };

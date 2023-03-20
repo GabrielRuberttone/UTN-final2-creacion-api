@@ -9,7 +9,40 @@ const server = express(); //creamos nuestro servidor. En server estan todos los 
 //expres core middleware
 server.use(express.static('public'));
 server.use(express.json())
-server.use(express.urlencoded({extended: true })) 
+server.use(express.urlencoded({extended: true }))
+//-------------------- 
+const path = require("path")//no hay que instalar path porque esta en el core de node, solo lo importo.
+//handlebars for reset password form
+const exphbs = require("express-handlebars");
+
+//cargamos la referencia al directorio de bootstrap. Se hace despues del server. 
+server.use("/css", express.static(path.join(__dirname,"node_modules/bootstrap/dist/css")))
+server.use("/js", express.static(path.join(__dirname,"node_modules/bootstrap/dist/js")))
+
+//handlebars settings. Usamos custom helpers 01:10:53 video
+const hbs = exphbs.create({
+    defaultLayout: "main", 
+    layoutsDir: path.join(__dirname, "views/layouts"),
+    partialsDir: path.join(__dirname, "views/partials"),
+    helpers: {
+        errBelowInput: function(arrWarnings, inputName){
+            if(!arrWarnings) return null;
+            const Warning = arrWarnings.find((el)=> el.param === inputName);
+        if(Warning == undefined){
+            return null;
+        } else {
+            return Warning.msg;
+            //todo: retornar html con css
+        }
+    }
+}
+})
+
+server.set("views", "./views");
+server.engine("handlebars", hbs.engine);
+server.set("view engine", "handlebars");
+
+//---------------------
 
 //external middlewares
 server.use(cors());//esto lleva una configuracion, aca indico desde donde se puede acceder o no, sino indico nada se puede acceder desde cualquier servidor q sea distinto de donde esta alojada la API. 
