@@ -1,33 +1,57 @@
 {{!-- hacemos el formulario --}}
 <section class="mt-5 container">
-<div class="row justify-content-center">
+ <div class="row justify-content-center">
     <h2 class="text-center my-5">Password Recovery</h2>
     <div class="col-10 col-lg-5" >
-        <form class="border border-dark rounded p-4" action="/api/users/reset/{{token}}" method="post">
+     <form 
+        class="border border-dark rounded p-4" 
+        action="/api/users/reset/{{token}}" method="post">
+
         <input type="text" value="{{tokenStatus.name}}"
         autocomplete="username" hidden/>
 
-        <input type="text" type="password" maxlength="16"
+        <input class="form-control mt-3" type="password" maxlength="16"
         placeholder="Type new password" autocomplete="new-password"      
         name="password_1" autofocus />
+
+
+
+
+
+
+
+
+
+
         {{#errBelowInput arrWarnings "password_1"}}
+
         {{msg}}
+
         {{/errBelowInput}}
-        <div id="passwordHelpBlock" > 
+
+     {{!-- </div> --}}
+        <div id="passwordHelpBlock" class="form-text mb-4"> 
             Your password must be 8-16 characters long.
         </div>
 
-        <input class="form-control mt-3" type="text" type="password" maxlength="16"
+        <input class="form-control" type="password" maxlength="16"
         placeholder="Repeat new password" autocomplete="new-password"      
-        name="password_2" autofocus />
+        name="password_2"/>
+
         {{#errBelowInput arrWarnings "password_2"}}
         {{msg}}
         {{/errBelowInput}}
-        <div id="passwordHelpBlock" > 
+
+        <div id="repeatPasswordHelpBlock" class="form-text mb-5" > 
             Both password must be identical.
         </div>
-        <input type="submit" value="save new password">
-        </form>
+
+        <div class="d-flex justify-content-center"> 
+         <input type="submit" value="send new password">
+         </div>
+         
+     </form>
+        
     </div>
-</div>
+ </div>
 </section>

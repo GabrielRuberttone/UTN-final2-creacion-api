@@ -30,9 +30,14 @@ const hbs = exphbs.create({
             const Warning = arrWarnings.find((el)=> el.param === inputName);
         if(Warning == undefined){
             return null;
-        } else {
-            return Warning.msg;
-            //todo: retornar html con css
+        } else {//todo: retornar html con css
+            return `
+            <div class="alert alert-danger mt-1"  role="alert">
+            ${Warning.msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"
+            aria-label="Close"></button>
+            </div>
+            `;
         }
     }
 }
